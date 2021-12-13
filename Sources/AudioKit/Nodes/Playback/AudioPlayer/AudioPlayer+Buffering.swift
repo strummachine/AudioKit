@@ -62,33 +62,35 @@ extension AudioPlayer {
             return
         }
 
-        let playerChannelCount = playerNode.outputFormat(forBus: 0).channelCount
+        if loadMonoFileAsStereoBuffer {
+            let playerChannelCount = playerNode.outputFormat(forBus: 0).channelCount
 
-        if pcmBuffer.format.channelCount < playerChannelCount {
-            Log("Copying mono data to 2 channel buffer...", pcmBuffer.format)
+            if pcmBuffer.format.channelCount < playerChannelCount {
+                Log("Copying mono data to 2 channel buffer...", pcmBuffer.format)
 
-            guard let tmpBuffer = AVAudioPCMBuffer(pcmFormat: playerNode.outputFormat(forBus: 0),
-                                                   frameCapacity: frameCount),
-                let monoData = pcmBuffer.floatChannelData else {
-                Log("Failed to setup mono conversion buffer", type: .error)
-                return
-            }
-
-            // TODO: this creates a situation where the buffer is copied twice if it needs to be reversed
-            // i is the index in the buffer
-            for i in 0 ..< Int(pcmBuffer.frameLength) {
-                // n is the channel
-                for n in 0 ..< Int(playerChannelCount) {
-                    //                    let sample = monoData[0][i]
-                    tmpBuffer.floatChannelData?[n][i] = monoData[0][i]
-                    // Log(sample)
+                guard let tmpBuffer = AVAudioPCMBuffer(pcmFormat: playerNode.outputFormat(forBus: 0),
+                                                       frameCapacity: frameCount),
+                    let monoData = pcmBuffer.floatChannelData else {
+                    Log("Failed to setup mono conversion buffer", type: .error)
+                    return
                 }
-            }
-            tmpBuffer.frameLength = pcmBuffer.frameLength
-            buffer = tmpBuffer
 
-        } else {
-            buffer = pcmBuffer
+                // TODO: this creates a situation where the buffer is copied twice if it needs to be reversed
+                // i is the index in the buffer
+                for i in 0 ..< Int(pcmBuffer.frameLength) {
+                    // n is the channel
+                    for n in 0 ..< Int(playerChannelCount) {
+                        //                    let sample = monoData[0][i]
+                        tmpBuffer.floatChannelData?[n][i] = monoData[0][i]
+                        // Log(sample)
+                    }
+                }
+                tmpBuffer.frameLength = pcmBuffer.frameLength
+                buffer = tmpBuffer
+
+            } else {
+                buffer = pcmBuffer
+            }
         }
 
         // Now, we'll reverse the data in the buffer if specified

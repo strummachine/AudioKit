@@ -49,6 +49,9 @@ public class AudioPlayer: Node {
         }
     }
 
+    /// Copies mono source file into a stereo buffer; true by default.
+    public var loadMonoFileAsStereoBuffer: Bool = true
+
     private var _isReversed: Bool = false
 
     /// Will reverse the file and convert to a buffered format if it's not already
