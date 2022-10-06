@@ -47,10 +47,11 @@ public:
             float leftIn = inputSample(0, i);
 
             float& leftOut = outputSample(0, i);
+            float& rightOut = outputSample(1, i);
 
             float gain = gainRamp.getAndStep();
 
-            leftOut = leftIn * gain;
+            leftOut = rightOut = leftIn * gain;
 
         }
     }
