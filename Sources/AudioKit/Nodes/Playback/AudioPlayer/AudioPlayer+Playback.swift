@@ -36,7 +36,9 @@ extension AudioPlayer {
 
         if when != nil {
             scheduleTime = nil
-            playerNode.stop()
+            if playerNode.isPlaying {
+                playerNode.stop()
+            }
         }
 
         editStartTime = startTime ?? editStartTime
